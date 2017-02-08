@@ -8,7 +8,7 @@ from django.test import TestCase
 import mock
 
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
-from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory, ProgramTypeFactory
+from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory, ProgramTypeFactory, CourseRunFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.catalog.utils import (
     get_programs,
@@ -162,6 +162,11 @@ class TestGetPrograms(CatalogIntegrationMixin, TestCase):
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
 class TestGetProgramTypes(CatalogIntegrationMixin, ModuleStoreTestCase):
     """Tests covering retrieval of program types from the catalog service."""
+    def setUp(self):
+        super(TestGetProgramTypes, self).setUp()
+
+        self.catalog_program = ProgramFactory()
+
     def test_get_program_types(self, mock_get_edx_api_data):
         """Verify get_program_types returns the expected list of program types."""
         program_types = ProgramTypeFactory.create_batch(3)
