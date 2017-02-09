@@ -14,6 +14,7 @@ from student.helpers import get_next_url_for_login_page
 
 LOGGER_NAME = "student.helpers"
 
+
 @ddt.ddt
 class TestLoginHelper(TestCase):
     """Test login helper methods."""
@@ -31,7 +32,7 @@ class TestLoginHelper(TestCase):
         """ Test unsafe next parameter """
         with LogCapture(LOGGER_NAME, level=logging.WARNING) as logger:
             req = self.request.get(reverse("login") + "?next={url}".format(url=unsafe_url))
-            req.META["HTTP_ACCEPT"] = "image/*"
+            req.META["HTTP_ACCEPT"] = "image/*"  # pylint: disable=no-member
             get_next_url_for_login_page(req)
             logger.check(
                 (LOGGER_NAME, "WARNING",
@@ -41,6 +42,6 @@ class TestLoginHelper(TestCase):
     def test_safe_next(self):
         """ Test safe next parameter """
         req = self.request.get(reverse("login") + "?next={url}".format(url="/dashboard"))
-        req.META["HTTP_ACCEPT"] = "text/html"
+        req.META["HTTP_ACCEPT"] = "text/html"  # pylint: disable=no-member
         next_page = get_next_url_for_login_page(req)
         self.assertEqual(next_page, u'/dashboard')
