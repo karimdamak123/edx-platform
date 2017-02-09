@@ -1249,7 +1249,6 @@ class MoveComponentTest(ContainerBase):
             component_display_names_after_operation=['HTML 11', 'HTML 12']
         )
 
-    @attr('a11y')
     def test_a11y(self):
         """
         Verify move modal a11y.
