@@ -3,7 +3,7 @@ from datetime import datetime
 import logging
 import urllib
 
-from pytz import UTC
+from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils import http
 from oauth2_provider.models import (
@@ -14,6 +14,7 @@ from provider.oauth2.models import (
     AccessToken as dop_access_token,
     RefreshToken as dop_refresh_token
 )
+from pytz import UTC
 
 import third_party_auth
 from lms.djangoapps.verify_student.models import VerificationDeadline, SoftwareSecurePhotoVerification
@@ -273,7 +274,9 @@ def get_redirect_to(request):
 
     # if we get a redirect parameter, make sure it's safe and redirecting to web page.
     # If it's not, drop the parameter.
-    if redirect_to and (not http.is_safe_url(redirect_to) or 'text/html' not in header_accept):
+    if redirect_to and (not http.is_safe_url(redirect_to)
+                        or settings.STATIC_URL in redirect_to
+                        or 'text/html' not in header_accept):
         log.warning(
             u'Unsafe redirect parameter detected after login page: %(redirect_to)r',
             {"redirect_to": redirect_to}
