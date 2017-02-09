@@ -22,15 +22,16 @@ class TestLoginHelper(TestCase):
         self.request = RequestFactory()
 
     @ddt.data(
-        'https://www.amazon.com',
-        'favicon.ico',
-        'https://www.test.com/test.jpg',
+        "https://www.amazon.com",
+        "favicon.ico",
+        "https://www.test.com/test.jpg",
         settings.STATIC_URL + "dummy.png"
     )
     def test_unsafe_next(self, unsafe_url):
         """ Test unsafe next parameter """
         with LogCapture(LOGGER_NAME, level=logging.WARNING) as logger:
             req = self.request.get(reverse("login") + "?next={url}".format(url=unsafe_url))
+            req.META["HTTP_ACCEPT"] = "image/*"
             get_next_url_for_login_page(req)
             logger.check(
                 (LOGGER_NAME, "WARNING",
@@ -40,5 +41,6 @@ class TestLoginHelper(TestCase):
     def test_safe_next(self):
         """ Test safe next parameter """
         req = self.request.get(reverse("login") + "?next={url}".format(url="/dashboard"))
+        req.META["HTTP_ACCEPT"] = "text/html"
         next_page = get_next_url_for_login_page(req)
         self.assertEqual(next_page, u'/dashboard')

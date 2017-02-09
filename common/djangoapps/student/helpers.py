@@ -1,11 +1,9 @@
 """Helpers for the student app. """
 from datetime import datetime
 import logging
-import os
 import urllib
 
 from pytz import UTC
-from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.utils import http
 from oauth2_provider.models import (
@@ -271,14 +269,11 @@ def get_redirect_to(request):
     :returns: redirect url if safe else None
     """
     redirect_to = request.GET.get('next')
-    _, file_extension = os.path.splitext(redirect_to)
+    header_accept = request.META.get('HTTP_ACCEPT', '')
 
-    # if we get a redirect parameter, make sure it's safe. If it's not, drop the
-    # parameter.
-    if redirect_to and (not http.is_safe_url(redirect_to)
-                        or settings.STATIC_URL in redirect_to
-                        or file_extension):
-
+    # if we get a redirect parameter, make sure it's safe and redirecting to web page.
+    # If it's not, drop the parameter.
+    if redirect_to and (not http.is_safe_url(redirect_to) or 'text/html' not in header_accept):
         log.warning(
             u'Unsafe redirect parameter detected after login page: %(redirect_to)r',
             {"redirect_to": redirect_to}
