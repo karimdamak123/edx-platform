@@ -289,13 +289,13 @@ class ContainerPage(PageObject, HelpMixin):
         """
         Click undo move link.
         """
-        click_css(self, '#page-alert .alert.confirmation .action-undo-move')
+        click_css(self, '#page-alert .alert.confirmation .nav-actions .action-primary')
 
     def click_take_me_link(self):
         """
         Click take me there link.
         """
-        click_css(self, '#page-alert .alert.confirmation #alert-confirmation-title a', require_notification=False)
+        click_css(self, '#page-alert .alert.confirmation .nav-actions .action-secondary', require_notification=False)
 
     def add_missing_groups(self):
         """
