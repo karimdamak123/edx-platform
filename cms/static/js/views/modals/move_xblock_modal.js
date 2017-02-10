@@ -2,23 +2,29 @@
  * The MoveXblockModal to move XBlocks in course.
  */
 define([
-    'jquery', 'backbone', 'underscore', 'gettext',
-    'js/views/baseview', 'js/views/modals/base_modal',
-    'js/models/xblock_info', 'js/views/move_xblock_list', 'js/views/move_xblock_breadcrumb',
-    'common/js/components/views/feedback',
+    'jquery',
+    'backbone',
+    'underscore',
+    'gettext',
+    'js/views/baseview',
     'js/views/utils/xblock_utils',
     'js/views/utils/move_xblock_utils',
     'edx-ui-toolkit/js/utils/html-utils',
     'edx-ui-toolkit/js/utils/string-utils',
+    'common/js/components/views/feedback',
+    'js/models/xblock_info',
+    'js/views/modals/base_modal',
+    'js/views/move_xblock_list',
+    'js/views/move_xblock_breadcrumb',
     'text!templates/move-xblock-modal.underscore'
 ],
-function($, Backbone, _, gettext, BaseView, BaseModal, XBlockInfoModel, MoveXBlockListView, MoveXBlockBreadcrumbView,
-         Feedback, XBlockViewUtils, MoveXBlockUtils, HtmlUtils, StringUtils, MoveXblockModalTemplate) {
+function($, Backbone, _, gettext, BaseView, XBlockViewUtils, MoveXBlockUtils, HtmlUtils, StringUtils, Feedback,
+         XBlockInfoModel, BaseModal, MoveXBlockListView, MoveXBlockBreadcrumbView, MoveXblockModalTemplate) {
     'use strict';
 
     var MoveXblockModal = BaseModal.extend({
         events: _.extend({}, BaseModal.prototype.events, {
-            'click .action-move': 'moveXBlock'
+            'click .action-move:not(.is-disabled)': 'moveXBlock'
         }),
 
         options: $.extend({}, BaseModal.prototype.options, {
@@ -70,7 +76,7 @@ function($, Backbone, _, gettext, BaseView, BaseModal, XBlockInfoModel, MoveXBlo
         show: function() {
             BaseModal.prototype.show.apply(this, [false]);
             this.updateMoveState(false);
-            MoveXBlockUtils.hideMovedNotification(Feedback);
+            MoveXBlockUtils.hideMovedNotification();
         },
 
         hide: function() {
@@ -81,7 +87,7 @@ function($, Backbone, _, gettext, BaseView, BaseModal, XBlockInfoModel, MoveXBlo
                 this.moveXBlockBreadcrumbView.remove();
             }
             BaseModal.prototype.hide.apply(this);
-            // Feedback.prototype.outFocus.apply(this);
+            Feedback.prototype.outFocus.apply(this);
         },
 
         focusModal: function() {
@@ -124,13 +130,10 @@ function($, Backbone, _, gettext, BaseView, BaseModal, XBlockInfoModel, MoveXBlo
         updateMoveState: function(isValidMove) {
             var $moveButton = this.$el.find('.action-move');
             if (isValidMove) {
-                $moveButton.removeAttr('disabled');
-                $moveButton.removeClass('is-disabled');
+                $moveButton.removeAttr('disabled').removeClass('is-disabled');
             } else {
-                $moveButton.attr('disabled', true);
-                $moveButton.addClass('is-disabled');
+                $moveButton.attr('disabled', true).addClass('is-disabled');
             }
-            this.isValidMove = isValidMove || false;
         },
 
         enableMoveOperation: function(targetParentXBlockInfo) {
@@ -147,32 +150,28 @@ function($, Backbone, _, gettext, BaseView, BaseModal, XBlockInfoModel, MoveXBlo
 
         moveXBlock: function() {
             var self = this;
-            if (self.isValidMove) {
-                XBlockViewUtils.moveXBlock(self.sourceXBlockInfo.id, self.targetParentXBlockInfo.id)
-                .done(function(response) {
-                    if (response.move_source_locator) {
-                        // hide modal
-                        self.hide();
-                        // hide xblock element
-                        $("li.studio-xblock-wrapper[data-locator='" + self.sourceXBlockInfo.id + "']").hide();
-                        self.movedAlertView = MoveXBlockUtils.showMovedNotification(
-                            StringUtils.interpolate(
-                                gettext('Success! "{displayName}" has been moved.'),
-                                {
-                                    displayName: self.sourceXBlockInfo.get('display_name')
-                                }
-                            ),
-                            {
-                                sourceDisplayName: self.sourceXBlockInfo.get('display_name'),
-                                sourceLocator: self.sourceXBlockInfo.id,
-                                sourceParentLocator: self.sourceParentXBlockInfo.id,
-                                targetParentLocator: response.parent_locator,
-                                targetIndex: response.source_index
-                            }
-                        );
+            XBlockViewUtils.moveXBlock(self.sourceXBlockInfo.id, self.targetParentXBlockInfo.id)
+            .done(function(response) {
+                // hide modal
+                self.hide();
+                // hide xblock element
+                $("li.studio-xblock-wrapper[data-locator='" + self.sourceXBlockInfo.id + "']").hide();
+                self.movedAlertView = MoveXBlockUtils.showMovedNotification(
+                    StringUtils.interpolate(
+                        gettext('Success! "{displayName}" has been moved.'),
+                        {
+                            displayName: self.sourceXBlockInfo.get('display_name')
+                        }
+                    ),
+                    {
+                        sourceDisplayName: self.sourceXBlockInfo.get('display_name'),
+                        sourceLocator: self.sourceXBlockInfo.id,
+                        sourceParentLocator: self.sourceParentXBlockInfo.id,
+                        targetParentLocator: response.parent_locator,
+                        targetIndex: response.source_index
                     }
-                });
-            }
+                );
+            });
         }
     });
 
