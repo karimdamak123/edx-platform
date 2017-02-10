@@ -158,14 +158,22 @@ class TestGetPrograms(CatalogIntegrationMixin, TestCase):
         self.assertEqual(actual, programs_with_program_type)
 
 
+def patched_get_programs(uuid=None):
+    """
+    Fake get_program() that mimics the get_programs()
+    behavior depending upon if the uuid was provided or not.
+    """
+    if uuid:
+        return TestGetProgramTypes.catalog_program
+    else:
+        return [TestGetProgramTypes.catalog_program]
+
+
 @skip_unless_lms
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
 class TestGetProgramTypes(CatalogIntegrationMixin, ModuleStoreTestCase):
     """Tests covering retrieval of program types from the catalog service."""
-    def setUp(self):
-        super(TestGetProgramTypes, self).setUp()
-
-        self.catalog_program = ProgramFactory()
+    catalog_program = ProgramFactory()
 
     def test_get_program_types(self, mock_get_edx_api_data):
         """Verify get_program_types returns the expected list of program types."""
