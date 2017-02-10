@@ -1,6 +1,6 @@
 """Tests covering utilities for integrating with the catalog service."""
 # pylint: disable=missing-docstring
-import uuid
+from uuid import uuid4
 import copy
 
 from django.contrib.auth import get_user_model
