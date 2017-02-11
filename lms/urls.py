@@ -428,10 +428,10 @@ urlpatterns += (
 
     url(
         r'^programs/{}/detail$'.format(
-            settings.PROGRAM_ID_PATTERN,
+            r'^programs/(?P<program_uuid>[0-9a-f-]+)/$',
         ),
-        'courseware.views.views.program_detail',
-        name='program_detail',
+        'courseware.views.views.program_marketing',
+        name='program_marketing_view',
     ),
 
     # rest api for grades

@@ -1,6 +1,6 @@
 """Tests covering utilities for integrating with the catalog service."""
 # pylint: disable=missing-docstring
-from uuid import uuid4
+import uuid
 import copy
 
 from django.contrib.auth import get_user_model
@@ -8,7 +8,7 @@ from django.test import TestCase
 import mock
 
 from openedx.core.djangoapps.catalog.models import CatalogIntegration
-from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory, ProgramTypeFactory, CourseRunFactory
+from openedx.core.djangoapps.catalog.tests.factories import ProgramFactory, ProgramTypeFactory
 from openedx.core.djangoapps.catalog.tests.mixins import CatalogIntegrationMixin
 from openedx.core.djangoapps.catalog.utils import (
     get_programs,
@@ -158,23 +158,10 @@ class TestGetPrograms(CatalogIntegrationMixin, TestCase):
         self.assertEqual(actual, programs_with_program_type)
 
 
-def patched_get_programs(uuid=None):
-    """
-    Fake get_program() that mimics the get_programs()
-    behavior depending upon if the uuid was provided or not.
-    """
-    if uuid:
-        return TestGetProgramTypes.catalog_program
-    else:
-        return [TestGetProgramTypes.catalog_program]
-
-
 @skip_unless_lms
 @mock.patch(UTILS_MODULE + '.get_edx_api_data')
 class TestGetProgramTypes(CatalogIntegrationMixin, ModuleStoreTestCase):
     """Tests covering retrieval of program types from the catalog service."""
-    catalog_program = ProgramFactory()
-
     def test_get_program_types(self, mock_get_edx_api_data):
         """Verify get_program_types returns the expected list of program types."""
         program_types = ProgramTypeFactory.create_batch(3)
