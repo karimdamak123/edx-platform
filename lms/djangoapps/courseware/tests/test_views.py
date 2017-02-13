@@ -352,15 +352,17 @@ class ViewsTestCase(ModuleStoreTestCase):
     @patch.dict(settings.FEATURES, {'RESTRICT_ENROLL_BY_REG_METHOD': False})
     def test_program_detail_view(self):
         program_detail = "<div id='program-details-page'>"
-        url = reverse('program_detail', kwargs={'program_id': str(uuid.uuid4())})
+        url = reverse('program_marketing_view', kwargs={'program_uuid': str(uuid.uuid4())})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-        with mock.patch("courseware.views.views.get_active_programs_data") as patched_get_active_programs_data:
-            patched_get_active_programs_data.return_value = mock_data.PROGRAM_DATA
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
-            self.assertNotIn(program_detail, response.content)
+        with mock.patch("courseware.views.views.get_programs") as patched_get_programs:
+            with mock.patch("courseware.views.views.ProgramDataExtender") as patched_program_data_extender_class:
+                patched_get_programs.return_value = mock_data.PROGRAM_DATA
+                patched_program_data_extender_class.extend.return_value = mock_data.PROGRAM_DATA
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
+                self.assertNotIn(program_detail, response.content)
 
     def test_index_no_visible_section_in_chapter(self):
 
