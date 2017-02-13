@@ -1,7 +1,6 @@
 """
 Courseware views functions
 """
-import re
 import json
 import logging
 import urllib
@@ -708,26 +707,6 @@ def course_about(request, course_id):
         return render_to_response('courseware/course_about.html', context)
 
 
-# TODO: make this efficient
-def _add_course_info(program, user):
-    for program_course in program['courses']:
-        for course_run in program_course['course_runs']:
-            course = modulestore().get_course(CourseKey.from_string(course_run['key']))
-            course_run.update({
-                'registered': registered_for_course(course, user),
-                'can_enroll': bool(has_access(user, 'enroll', course)),
-                'is_shib_course': uses_shib(course)
-            })
-
-
-def _get_youtube_url_identifier(url):
-    pattern = r'(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})'
-    patterns = re.search(pattern, url)
-    if patterns:
-        return patterns.groups()[0]
-    return url
-
-
 @ensure_csrf_cookie
 @cache_if_anonymous()
 def program_marketing(request, program_uuid):
@@ -740,7 +719,6 @@ def program_marketing(request, program_uuid):
         raise Http404
 
     program_data = ProgramDataExtender(program_data, request.user).extend(include_instructors=True)
-    _add_course_info(program_data, request.user)
 
     context = {
         'faq': program_data['faq'],
@@ -758,8 +736,8 @@ def program_marketing(request, program_uuid):
         'authoring_organizations': program_data['authoring_organizations'],
         'min_hours_effort_per_week': program_data['min_hours_effort_per_week'],
         'max_hours_effort_per_week': program_data['max_hours_effort_per_week'],
-        'banner_image': program_data.get('banner_image', {}).get('large', {}).get('url', ''),
-        'video': _get_youtube_url_identifier(program_data.get('video', {}).get('src'))
+        'video_url': program_data.get('video', {}).get('src'),
+        'banner_image': program_data.get('banner_image', {}).get('large', {}).get('url', '')
     }
 
     return render_to_response('courseware/program_detail.html', context)
