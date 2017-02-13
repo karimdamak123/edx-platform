@@ -744,6 +744,7 @@ def program_marketing(request, program_uuid):
 
     context = {
         'faq': program_data['faq'],
+        'type': program_data['type'],
         'title': program_data['title'],
         'status': program_data['status'],
         'courses': program_data['courses'],
@@ -757,7 +758,6 @@ def program_marketing(request, program_uuid):
         'authoring_organizations': program_data['authoring_organizations'],
         'min_hours_effort_per_week': program_data['min_hours_effort_per_week'],
         'max_hours_effort_per_week': program_data['max_hours_effort_per_week'],
-        'type': program_data.get('type', {}).get('name', ''),
         'banner_image': program_data.get('banner_image', {}).get('large', {}).get('url', ''),
         'video': _get_youtube_url_identifier(program_data.get('video', {}).get('src'))
     }
