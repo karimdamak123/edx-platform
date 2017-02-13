@@ -192,21 +192,18 @@ from openedx.core.djangolib.markup import HTML, Text
 </%block>
 
 <div id="program-details-page">
-        <%
-            banner_url = program['banner_image']
-        %>
-        <div class="main-banner" style="background: #000 url(${banner_url}) no-repeat center center;">
+        <div class="main-banner" style="background: #000 url(${banner_image}) no-repeat center center;">
             <div class="grid-manual">
                 <div class="row">
                     <div class="col col-12 md-col-8 lg-col-9">
                         <div class="org-logo">
-                            % if program.get('authoring_organizations'):
-                                <img src="${program.get('authoring_organizations')[0]['logo_image_url']}" alt="${program['authoring_organizations'][0]['name']}">
+                            % if authoring_organizations:
+                                <img src="${authoring_organizations[0]['logo_image_url']}" alt="${authoring_organizations[0]['name']}">
                             % endif
                         </div>
-                        <h1 class="banner-title">${program['title']}</h1>
-                        <p class="banner-description">${program['subtitle']}</p>
-                        <button type="button" class="btn-brand hidden-sm">Start the ${program['type']} Program</button>
+                        <h1 class="banner-title">${title}</h1>
+                        <p class="banner-description">${subtitle}</p>
+                        <button type="button" class="btn-brand hidden-sm">Start the ${type} Program</button>
                     </div>
                     <div class="col col-12 md-col-4 lg-col-3" id="course-trailer">
                         <a href="#video-modal" class="media trailer-link visible-sm" rel="leanModal">
@@ -232,21 +229,21 @@ from openedx.core.djangolib.markup import HTML, Text
                                 <span class="fa fa-book fa-lg" aria-hidden="true"></span>
                                 Number of Courses
                             </span>
-                            <a href="#courses">${len(program['courses'])} courses in program</a>
+                            <a href="#courses">${len(courses)} courses in program</a>
                         </li>
                         <li class="item">
                             <span>
                                 <span class="fa fa-clock-o fa-lg" aria-hidden="true"></span>
                                 Average Length
                             </span>
-                            <span>${program['weeks_to_complete']} weeks per course</span>
+                            <span>${weeks_to_complete} weeks per course</span>
                         </li>
                         <li class="item">
                             <span>
                                 <span class="fa fa-tachometer fa-lg" aria-hidden="true"></span>
                                 Effort
                             </span>
-                            <span>${program['min_hours_effort_per_week']}-${program['max_hours_effort_per_week']} hours per week, per course</span>
+                            <span>${min_hours_effort_per_week}-${max_hours_effort_per_week} hours per week, per course</span>
                         </li>
                         <li class="item">
                             <span>
@@ -261,7 +258,7 @@ from openedx.core.djangolib.markup import HTML, Text
                             <div class="accordion-head">Overview</div>
                             <div class="accordion-content">
                                 <p>
-                                    ${program['overview']}
+                                    ${overview}
                                 </p>
                             </div>
                         </div>
@@ -270,7 +267,7 @@ from openedx.core.djangolib.markup import HTML, Text
                             <div class="accordion-content">
 
                                 <ul class="list-bulleted list-disc no-indent">
-                                    % for item in program['job_outlook_items']:
+                                    % for item in job_outlook_items:
                                         <li>${item}</li>
                                     % endfor
                                 </ul>
@@ -280,7 +277,7 @@ from openedx.core.djangolib.markup import HTML, Text
                             <div class="accordion-head">What You'll Learn</div>
                             <div class="accordion-content">
                                 <ul class="list-bulleted list-disc no-indent">
-                                    % for item in program['expected_learning_items']:
+                                    % for item in expected_learning_items:
                                         <li>${item}</li>
                                     % endfor
                                 </ul>
@@ -290,7 +287,7 @@ from openedx.core.djangolib.markup import HTML, Text
                             <div class="accordion-head">Instructors</div>
                             <div class="accordion-content">
                                 <div class="instructor-profiles">
-                                    %for instructor in program['instructors']:
+                                    %for instructor in instructors:
                                         <div class="profile-item">
                                             <div class="avatar">
                                                 <div class="img-holder">
@@ -311,7 +308,7 @@ from openedx.core.djangolib.markup import HTML, Text
                             <div class="accordion-head">FAQ</div>
                             <div class="accordion-content">
                                 <ul class="list-unstyled faq-links-list">
-                                    %for item in program['faq']:
+                                    %for item in faq:
                                         <li class="item">
                                             <a href="#!">${item['question']}</a>
                                             <div class="answer hidden">${item['answer']}</div>
@@ -323,15 +320,15 @@ from openedx.core.djangolib.markup import HTML, Text
                     </div>
                     <blockquote class="program-quote visible-sm">
                         <div class="quote">
-                          % if program.get('individual_endorsements'):
+                          % if individual_endorsements:
                             <span>
-                                ${program['individual_endorsements'][0]['quote']}
+                                ${individual_endorsements[0]['quote']}
                             </span>
-                            % if program['individual_endorsements'][0].get('endorser'):
-                              <img class="visible-sm pull-left" src="${program['individual_endorsements'][0]['endorser']['profile_image_url']}" width="40" height="40"/>
+                            % if individual_endorsements[0].get('endorser'):
+                              <img class="visible-sm pull-left" src="${individual_endorsements[0]['endorser']['profile_image_url']}" width="40" height="40"/>
                               <span class="writer">
-                                ${program['individual_endorsements'][0]['endorser']['given_name']},
-                                ${program['individual_endorsements'][0]['endorser']['position']['title']}
+                                ${individual_endorsements[0]['endorser']['given_name']},
+                                ${individual_endorsements[0]['endorser']['position']['title']}
                               </span>
                             % endif
                           % endif
@@ -341,9 +338,9 @@ from openedx.core.djangolib.markup import HTML, Text
 
                 <div class="col col-12 md-col-5 lg-col-4 right-col hidden-sm">
 
-                    <h2 class="instructors-title">Meet the Instructors <span>(${len(program['instructors'])})</span></h2>
+                    <h2 class="instructors-title">Meet the Instructors <span>(${len(instructors)})</span></h2>
                     <div class="instructor-profiles">
-                        %for instructor in program['instructors']:
+                        %for instructor in instructors:
                             <div class="profile-item profile-item-desktop">
                                 <div class="avatar">
                                     <div class="img-holder">
@@ -358,7 +355,7 @@ from openedx.core.djangolib.markup import HTML, Text
                         %endfor
 
                         <div class="pagination hidden-xs">
-                            <div class="pages"><span class="pagination-start"></span>-<span class="pagination-end"></span> of <span class="instructor-size">${len(program['instructors'])}</span></div>
+                            <div class="pages"><span class="pagination-start"></span>-<span class="pagination-end"></span> of <span class="instructor-size">${len(instructors)}</span></div>
                             <div class="controls">
                                 <a href="#" id="pagination-next" class="active"><span class="fa fa-chevron-down active"></span></a>
                                 <a href="#" id="pagination-previous"><span class="fa fa-chevron-up"></span></a>
@@ -367,19 +364,19 @@ from openedx.core.djangolib.markup import HTML, Text
                     </div>
                     <blockquote class="program-quote">
                         <div class="quote">
-                          % if program.get('individual_endorsements'):
+                          % if individual_endorsements:
                             <span class="pull-right hidden-sm">
-                              % if program['individual_endorsements'][0].get('endorser'):
-                                <img src="${program['individual_endorsements'][0]['endorser']['profile_image_url']}" width="90" height="90"/>
+                              % if individual_endorsements[0].get('endorser'):
+                                <img src="${individual_endorsements[0]['endorser']['profile_image_url']}" width="90" height="90"/>
                               % endif
                             </span>
                             <span>
-                               ${program['individual_endorsements'][0]['quote']}
+                               ${individual_endorsements[0]['quote']}
                             </span>
                             <span class="writer">
-                              % if program['individual_endorsements'][0].get('endorser'):
-                                ${program['individual_endorsements'][0]['endorser']['given_name']},
-                                ${program['individual_endorsements'][0]['endorser']['position']['title']}
+                              % if individual_endorsements[0].get('endorser'):
+                                ${individual_endorsements[0]['endorser']['given_name']},
+                                ${individual_endorsements[0]['endorser']['position']['title']}
                               % endif
                             </span>
                           % endif
@@ -390,9 +387,9 @@ from openedx.core.djangolib.markup import HTML, Text
         </div>
 
         <div class="container courses-in-program" id="courses">
-            <h3 class="hd">Courses in the ${program['type']}</h3>
+            <h3 class="hd">Courses in the ${type}</h3>
             <div class="course-slider-xs">
-                %for course in program['courses']:
+                %for course in courses:
                   % if course.get('course_runs'):
                     <div class="course-card">
                         <div class="tbl-view">
@@ -449,7 +446,7 @@ from openedx.core.djangolib.markup import HTML, Text
     <section id="video-modal" class="modal modal-custom custom-video-modal">
       <div class="inner-wrapper">
         <iframe title="YouTube Video" width="640" height="360"
-                src="https://www.youtube.com/embed/${program['video']}?showinfo=0"
+                src="https://www.youtube.com/embed/${video}?showinfo=0"
                 frameborder="0" allowfullscreen></iframe>
       </div>
     </section>
