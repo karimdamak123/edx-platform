@@ -338,6 +338,11 @@ class ProgramDataExtender(object):
     def _attach_course_run_can_enroll(self, run_mode):
         run_mode['can_enroll'] = bool(has_access(self.user, 'enroll', self.course_overview))
 
+    def _attach_course_run_registered(self, run_mode):
+        # avoiding cyclic import error
+        from lms.djangoapps.courseware.views.views import registered_for_course
+        run_mode['registered'] = registered_for_course(self.course_overview, self.user)
+
     def _attach_instructors(self):
         """
         Extend the program data with instructor data. The instructor data added here is persisted
